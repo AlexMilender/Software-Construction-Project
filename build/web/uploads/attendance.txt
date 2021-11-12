@@ -1,0 +1,151 @@
+<?php include './adminHeader.php'; ?>
+<head>
+    <style>
+        .back{
+            background-image: url(images/pattern.png); 
+            width: 500px;
+            height: 700px;
+            margin-top: 2%;
+            margin-left: 30%;
+        }
+        .login, label{
+            color: #FFF
+        }
+        input[type="text"]{
+            border: 1px solid black;
+        }
+    </style>
+    <script>
+        function attendance(){
+            var empid=document.getElementById("id").value;
+            
+            var empname=document.getElementById("name").value;
+            var date=document.getElementById("date").value;
+            var logintime=document.getElementById("logintime").value;
+            var status=document.getElementById("status").value;
+            if(empid != null){
+            var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            var msg = this.responseText;
+                            document.getElementById('msg2').innerHTML = msg;
+                        }
+                    };
+                    xhttp.open("GET", "doattendance.php?id="+empid+"&name="+empname+"&date="+date+"&logintime="+logintime+"&status="+status+"", true);
+                    xhttp.send();
+        }}
+    </script>
+</head>
+<?php
+$value = " ";
+if (!empty($_GET)) {
+    $value = $_GET['value'];
+    echo $value;
+    if ($value == 1) {
+        ?>
+        <h3 style="margin-left: 10%; margin-top: 3%; color: green;"><?php echo 'Registration Successfull...'; ?></h3>
+        <?php
+    } else if ($value == 2) {
+        ?>
+        <h2 style="margin-left: 15%;margin-top: 3%;color: red;"><?php echo 'Failed'; ?></h2>
+        
+<?php
+}}
+$con = mysqli_connect("localhost", "root", "", "attendance");
+try {
+    if ($con) {
+        $query = "select * from register";
+        $recordset = mysqli_query($con, $query);
+        $count = mysqli_num_rows($recordset);
+        ?>
+        <div class="back">
+            <h1 class="col-md-offset-2 login">CHECK-IN</h1>
+            <div class="form-group row">
+                <div class="form-group col-md-7 col-md-offset-2">
+                    <label>EMPLOYEE ID</label>
+
+                    <select class="form-control" id="empid" onchange="showName(this.value)">
+                        <option value="-1" selected="selected">SELECT EMPLOYEE ID</option>
+                        <?php
+                        while ($row = mysqli_fetch_array($recordset)) {
+                            $empid = $row['empid'];
+                            ?>
+                            <option><?php echo $empid ?></option>
+                            <?php
+                        }
+                    }
+                } catch (Exception $exc) {
+                    echo $exc->getTraceAsString();
+                }
+                ?>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="form-group col-md-7 col-md-offset-2">
+            <label>EMPLOYEE NAME</label>
+            <input type="text" name="name" id="name" class="form-control" readonly="">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="form-group col-md-7 col-md-offset-2">
+            <label>DATE</label>
+            <input type="text" value="<?php echo date('Y-m-d'); ?>" name="date" id="date" class="form-control" readonly="">
+        </div>
+    </div>
+    <?php
+    if (function_exists('date_default_timezone_set')) {
+        date_default_timezone_set("Asia/Kolkata");
+    }
+    $date1 = date("h:i a");
+    ?>
+    <div class="form-group row">
+        <div class="form-group col-md-7 col-md-offset-2">
+            <label>LOGIN TIME</label>
+            <input type="text" value="<?php echo $date1 ?>" name="logintime" id="logintime" class="form-control" readonly="">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="form-group col-md-7 col-md-offset-2">
+            <label>STATUS</label>
+            <select class="form-control" id="status">
+                <option>Present</option>
+                <option>Absent</option>
+            </select>
+        </div>
+    </div>
+<p id="msg2"></p>
+    <div class="Reg-left Reg-right col-md-offset-3" style="margin-top: 5%;">
+        <input type="submit" value="Submit" onclick="return attendance()">
+        <input type="reset" value="Reset" class="col-md-offset-1">
+    </div>
+</div>
+
+<script>
+    function showName(str) {
+        var xhttp;
+//    function Invoke checking 
+//    alert(str);
+    
+        if (str == -1) {
+            alert("Please Choose Any of the following Employee Id....");
+            document.getElementById("empid").focus();
+            document.getElementById("name").value = "";
+            return false;
+        }
+        if (str == "") {
+            document.getElementById("name") = "Invalid Option";
+                    return;
+        }
+        xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("name").value = this.responseText;
+            }
+        };
+        xhttp.open("GET", "getName.php?q=" + str, true);
+        xhttp.send();
+    }
+</script>
+

@@ -1,0 +1,35 @@
+            #header_background{
+                        position :relative;
+                        -webkit-animation: mymove 4s infinite; /* Chrome, Safari, Opera */ 
+                        animation: mymove 4s infinite;  
+            }
+            /* Chrome, Safari, Opera */ 
+@-webkit-keyframes mymove {
+ 0% {background-color:cadetblue}
+ 25% {background-color:orangered}
+     50% {background-color: red;}
+     75% {background-color: tomato;}
+     100% {background-color:cadetblue;}
+}
+@keyframes mymove {
+ 0% {background-color:cadetblue}
+ 25% {background-color:orangered}
+     50% {background-color: red;}
+     75% {background-color: tomato;}
+     100% {background-color:cadetblue;}
+}
+
+    #arrange{
+        margin-top:25px;
+    }
+     .collegediv1{
+                border:10px solid #ddd;
+                height:250px;
+                width:650px;
+                margin:auto;
+                margin-bottom:50px;
+                margin-top:10px;
+            }
+            .collegediv1:hover{
+                box-shadow:4px 4px 4px 4px #ddd;
+            }

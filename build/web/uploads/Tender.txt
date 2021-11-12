@@ -1,0 +1,11 @@
+ALTER TABLE `tenderform` CHANGE `CompanyRegisterNumber` `CompanyRegisterNumber` VARCHAR(25) NOT NULL;
+
+start end date
+alert
+pin
+
+
+
+change database accepted tenders companyregnumber
+(ALTER TABLE `acceptedtenders` CHANGE `tenderId` `tenderId` VARCHAR(30) NOT NULL;)
+ALTER TABLE `acceptedtenders` CHANGE `pancard` `pancard` VARCHAR(30) NOT NULL;
