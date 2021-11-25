@@ -2,7 +2,7 @@ version: "3.3"
 services:
   db:
     build:
-      context: ./data
+      context: ../../../data/
       dockerfile: Dockerfile
     command: --default-authentication-plugin=mysql_native_password
     restart: always

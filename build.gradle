@@ -22,12 +22,12 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    annotationProcessor 'servlets.com:cos:05Nov2002'
-    implementation 'cos:cos:05Nov2002'
+    implementation 'servlets.com:cos:05Nov2002'
     compileOnly('javax:javaee-api:8.0.1')
-
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    implementation 'com.palantir.docker.compose:docker-compose-junit-jupiter:1.7.0'
 }
 
 sourceSets {
@@ -53,12 +53,3 @@ configurations {
 test {
     useJUnitPlatform()
 }
-
-task integrationTest(type: Test) {
-    group 'Test'
-    useJUnitPlatform()
-    mustRunAfter test
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-}
-

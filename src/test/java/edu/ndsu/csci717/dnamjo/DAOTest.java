@@ -1,13 +1,22 @@
 package edu.ndsu.csci717.dnamjo;
 
+import com.palantir.docker.compose.DockerComposeExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.Assertions;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.io.IOException;
 
-class DAOTest {
+public class DAOTest {
+
+    @RegisterExtension
+    public static DockerComposeExtension docker = DockerComposeExtension.builder()
+            .file("src/test/resources/docker-compose.test.yml")
+            .build();
 
     @Test
-    void doRegister() {
+    void doRegister() throws InterruptedException, IOException {
+        Assertions.assertTrue(false, "start from a failure");
     }
 
     @Test
