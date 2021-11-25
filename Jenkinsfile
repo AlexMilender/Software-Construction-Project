@@ -5,16 +5,18 @@ pipeline {
     triggers {
         cron(cronString)
     }
-
+    tools {
+        gradle "GRADLE_LATEST"
+    }
     stages {
         stage('Build') {
             steps {
-                echo 'Building..'
+                sh 'gradle build'
             }
         }
         stage('Test') {
             steps {
-                echo 'Testing..'
+                sh 'gradle test'
             }
         }
         stage('Deploy') {

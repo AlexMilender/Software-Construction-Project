@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'war'
+    id 'com.avast.gradle.docker-compose' version '0.7.1'
 }
 
 group 'edu.ndsu.csci717'
@@ -11,7 +12,7 @@ repositories {
 }
 
 ext {
-    junitVersion = '5.7.1'
+    junitVersion = '5.8.1'
 }
 
 sourceCompatibility = '1.8'
@@ -22,11 +23,12 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
+    implementation 'mysql:mysql-connector-java:8.0.27'
     implementation 'servlets.com:cos:05Nov2002'
     compileOnly('javax:javaee-api:8.0.1')
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     implementation 'com.palantir.docker.compose:docker-compose-junit-jupiter:1.7.0'
 }
 

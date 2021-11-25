@@ -1,11 +1,12 @@
 version: "3.3"
 services:
   db:
-    build:
-      context: ./data
-      dockerfile: Dockerfile
+    image: mysql
+    container_name: tendersdb
     command: --default-authentication-plugin=mysql_native_password
     restart: always
+    volumes:
+      - ./data/databaseinit.sql:/docker-entrypoint-initdb.d/databaseinit.sql
     ports:
       - "3306:3306"
     environment:

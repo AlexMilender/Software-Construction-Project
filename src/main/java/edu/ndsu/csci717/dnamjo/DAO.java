@@ -12,16 +12,13 @@ public class DAO {
      public DAO()
      {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/tenders", "root", "");
+            DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/tenders", "root", "i@hrX!48Ya6C9Zx%BpVRYBG&Q");
             if (con != null){
                 System.out.print("Connection Established .....");
             } else {
                 System.out.print("Connection not established...");
             }
-        } catch (ClassNotFoundException cne) {
-            System.out.println("Driver is not Loaded");
-            cne.printStackTrace();
         } catch (SQLException se) {
             System.out.println("Connection is not established");
             se.printStackTrace();

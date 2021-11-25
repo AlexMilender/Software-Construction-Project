@@ -11,12 +11,33 @@ public class DAOTest {
 
     @RegisterExtension
     public static DockerComposeExtension docker = DockerComposeExtension.builder()
-            .file("src/test/resources/docker-compose.test.yml")
+            .file("docker-compose.yml")
             .build();
 
     @Test
     void doRegister() throws InterruptedException, IOException {
-        Assertions.assertTrue(false, "start from a failure");
+        String name = "Bob";
+        String companyName= "Bob";
+        String registerId= "Bob";
+        String mobileNumber= "Bob";
+        String city= "Bob";
+        String state= "Bob";
+        String pinCode= "Bob";
+        String panNumber= "Bob";
+        String estYear= "Bob";
+        String radioopt= "Bob";
+        String radioopt1= "Bob";
+        String file1= "Bob";
+        String email= "Bob";
+        String password= "Bob";
+        String check= "Bob";
+        String desig= "Bob";
+        DTORegister dtoRegister = new DTORegister(name, companyName, registerId, mobileNumber, city, state, pinCode, panNumber, estYear, radioopt, radioopt1, file1, email, password, check, desig);
+
+        DAO dataAccess = new DAO();
+        boolean isSuccessful = dataAccess.doRegister(dtoRegister);
+
+        Assertions.assertTrue(isSuccessful, "Record inserted successfully");
     }
 
     @Test
