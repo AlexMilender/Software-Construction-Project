@@ -6,7 +6,7 @@ pipeline {
         cron(cronString)
     }
     tools {
-        gradle "GRADLE_LATEST"
+        gradle "CSCI717_Gradle"
     }
     stages {
         stage('Build') {
