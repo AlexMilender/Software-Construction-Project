@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'war'
-    id 'com.avast.gradle.docker-compose' version '0.7.1'
+    id "com.avast.gradle.docker-compose" version "0.14.9"
 }
 
 group 'edu.ndsu.csci717'
@@ -10,13 +10,14 @@ version '1.0-SNAPSHOT'
 repositories {
     mavenCentral()
 }
+apply plugin: 'docker-compose'
 
 ext {
     junitVersion = '5.8.1'
 }
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -28,30 +29,46 @@ dependencies {
     compileOnly('javax:javaee-api:8.0.1')
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-    implementation 'com.palantir.docker.compose:docker-compose-junit-jupiter:1.7.0'
-}
-
-sourceSets {
-    integrationTest {
-        java {
-            srcDir "src/test/java"
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-        }
-        resources.srcDir file("src/test/resources")
-    }
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-    integrationTestImplementation.extendsFrom implementation
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntime.extendsFrom testRuntime
 }
 
 test {
     useJUnitPlatform()
+}
+
+dockerCompose.isRequiredBy(test)
+
+dockerCompose {
+    useComposeFiles = ['docker-compose.yml']
+    startedServices = ['db'] // list of services to execute when calling 'docker-compose up' or 'docker-compose pull' (when not specified, all services are executed)
+    forceRecreate = true // pass '--force-recreate' and '--renew-anon-volumes' when calling 'docker-compose up' when set to 'true`
+
+    waitForTcpPorts = true // turns on/off the waiting for exposed TCP ports opening; default is true
+    waitForTcpPortsTimeout = java.time.Duration.ofMinutes(15) // how long to wait until all exposed TCP become open; default is 15 minutes
+    waitAfterTcpProbeFailure = java.time.Duration.ofSeconds(1) // how long to sleep before next attempt to check if a TCP is open; default is 1 second
+    tcpPortsToIgnoreWhenWaiting = [1234] // list of TCP ports what will be ignored when waiting for exposed TCP ports opening; default: empty list
+    waitForHealthyStateTimeout = java.time.Duration.ofMinutes(15) // how long to wait until a container becomes healthy; default is 15 minutes
+    waitAfterHealthyStateProbeFailure = java.time.Duration.ofSeconds(5) // how long to sleep before next attempt to check healthy status; default is 5 seconds
+    checkContainersRunning = true // turns on/off checking if container is running or restarting (during waiting for open TCP port and healthy state); default is true
+
+    captureContainersOutput = false // if true, prints output of all containers to Gradle output - very useful for debugging; default is false
+    stopContainers = true // doesn't call `docker-compose down` if set to false - see below the paragraph about reconnecting; default is true
+    removeContainers = true // default is true
+    retainContainersOnStartupFailure = false // if set to true, skips running ComposeDownForced task when ComposeUp fails - useful for troubleshooting; default is false
+    removeImages = com.avast.gradle.dockercompose.RemoveImages.None // Other accepted values are All and Local
+    removeVolumes = true // default is true
+    removeOrphans = true // removes containers for services not defined in the Compose file; default is false
+
+    dockerComposeStopTimeout = java.time.Duration.ofSeconds(20) // time before docker-compose sends SIGTERM to the running containers after the composeDown task has been started
+}
+test.doFirst {
+    // exposes "${serviceName}_HOST" and "${serviceName}_TCP_${exposedPort}" environment variables
+    // for example exposes "WEB_HOST" and "WEB_TCP_80" environment variables for service named `web` with exposed port `80`
+    // if service is scaled using scale option, environment variables will be exposed for each service instance like "WEB_1_HOST", "WEB_1_TCP_80", "WEB_2_HOST", "WEB_2_TCP_80" and so on
+    dockerCompose.exposeAsEnvironment(test)
+    // exposes "${serviceName}.host" and "${serviceName}.tcp.${exposedPort}" system properties
+    // for example exposes "web.host" and "web.tcp.80" system properties for service named `web` with exposed port `80`
+    // if service is scaled using scale option, environment variables will be exposed for each service instance like "web_1.host", "web_1.tcp.80", "web_2.host", "web_2.tcp.80" and so on
+    dockerCompose.exposeAsSystemProperties(test)
+    // get information about container of service `web` (declared in docker-compose.yml)
+    def dbInfo = dockerCompose.servicesInfos.db.firstContainer
 }

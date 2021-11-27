@@ -1,41 +1,38 @@
 package edu.ndsu.csci717.dnamjo;
 
-import com.palantir.docker.compose.DockerComposeExtension;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.Assertions;
-
-import java.io.IOException;
+import java.sql.SQLException;
 
 public class DAOTest {
 
-    @RegisterExtension
-    public static DockerComposeExtension docker = DockerComposeExtension.builder()
-            .file("docker-compose.yml")
-            .build();
-
     @Test
-    void doRegister() throws InterruptedException, IOException {
+    void doRegister() {
         String name = "Bob";
-        String companyName= "Bob";
-        String registerId= "Bob";
-        String mobileNumber= "Bob";
-        String city= "Bob";
-        String state= "Bob";
-        String pinCode= "Bob";
-        String panNumber= "Bob";
-        String estYear= "Bob";
-        String radioopt= "Bob";
-        String radioopt1= "Bob";
-        String file1= "Bob";
-        String email= "Bob";
-        String password= "Bob";
-        String check= "Bob";
-        String desig= "Bob";
-        DTORegister dtoRegister = new DTORegister(name, companyName, registerId, mobileNumber, city, state, pinCode, panNumber, estYear, radioopt, radioopt1, file1, email, password, check, desig);
+        String companyName = "Bob";
+        String registerId = "Bob";
+        String mobileNumber = "Bob";
+        String city = "Bob";
+        String state = "Bob";
+        String pinCode = "Bob";
+        String panNumber = "Bob";
+        String estYear = "1991-12-25";
+        String radioopt = "Bob";
+        String radioopt1 = "Bob";
+        String file1 = "Bob";
+        String email = "Bob";
+        String password = "Bob";
+        String check = "Bob";
+        String desig = "Bob";
 
+        DTORegister dtoRegister = new DTORegister(name, companyName, registerId, mobileNumber, city, state, pinCode, panNumber, estYear, radioopt, radioopt1, file1, email, password, check, desig);
         DAO dataAccess = new DAO();
-        boolean isSuccessful = dataAccess.doRegister(dtoRegister);
+        boolean isSuccessful = false;
+        try {
+            isSuccessful = dataAccess.doRegister(dtoRegister);
+        } catch (SQLException e) {
+            Assertions.fail("SQL Error: ",e);
+        }
 
         Assertions.assertTrue(isSuccessful, "Record inserted successfully");
     }
