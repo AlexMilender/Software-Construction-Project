@@ -43,6 +43,7 @@ public class DAOTest {
 
     @Test
     void loginCheck() {
+        Assertions.assertTrue(false, "login fail");
     }
 
     @Test
