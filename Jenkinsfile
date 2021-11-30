@@ -29,11 +29,6 @@ pipeline {
                 }
             }
         }
-        post{
-            always{
-                sh '''docker stop $(docker ps -q)'''
-            }
-        }
         stage('Deploy') {
             steps {
                 echo 'Deploying....'
