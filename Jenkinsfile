@@ -11,7 +11,11 @@ pipeline {
     stages {
         stage('Setup') {
             steps{
-                sh '''docker stop $(docker ps -q)'''
+                try {
+                    sh '''docker stop $(docker ps -q)'''
+                } catch(e) {
+                    echo "no docker containers to kill"
+                }
             }
         }
         stage('Build') {
@@ -24,7 +28,11 @@ pipeline {
                 sh 'gradle test'
                 post{
                     always{
-                        sh '''docker stop $(docker ps -q)'''
+                        try {
+                            sh '''docker stop $(docker ps -q)'''
+                        } catch(e) {
+                            echo "no docker containers to kill"
+                        }
                     }
                 }
             }
