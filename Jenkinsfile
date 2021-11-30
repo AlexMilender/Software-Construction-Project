@@ -9,6 +9,11 @@ pipeline {
         gradle "CSCI717_Gradle"
     }
     stages {
+        stage('Setup') {
+            steps{
+                sh docker stop $(docker ps -q)
+            }
+        }
         stage('Build') {
             steps {
                 sh 'gradle build'
