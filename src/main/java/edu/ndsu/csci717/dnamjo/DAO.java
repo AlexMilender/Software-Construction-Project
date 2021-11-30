@@ -5,6 +5,7 @@ import static java.lang.System.out;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class DAO {
@@ -97,21 +98,25 @@ public class DAO {
         return loginBean;
     }
 
-    public ResultSet getTendersData() throws SQLException {
+    public boolean getTendersData() throws SQLException {
         ResultSet rs = null;
+        boolean flag = true;
         try (Connection conn = getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement("select * from tenderform where clear='no'");
             rs = pstmt.executeQuery();
+            if (rs.next()){
+                flag = false;
+            }
         } catch (SQLException e) {
             e.getCause();
         }
-        return rs;
+        return flag;
     }
 
     public int ConformedTenders(String companyRegisterNumber, String pancard, BigDecimal quoteAmount, Timestamp AcceptedTime, String tenderId) throws SQLException {
         int i = 0;
         try (Connection conn = getConnection()) {
-            PreparedStatement pstmt = conn.prepareStatement("insert into AcceptedTenders values(?,?,?,?,?,?)");
+            PreparedStatement pstmt = conn.prepareStatement("insert into acceptedtenders values(?,?,?,?,?,?)");
             pstmt.setInt(1, 0);
             pstmt.setString(2, companyRegisterNumber);
             pstmt.setString(3, pancard);
@@ -142,69 +147,83 @@ public class DAO {
         return i;
     }
 
-    public ResultSet getPublishedData() throws SQLException {
+    public ArrayList<String> getPublishedData() throws SQLException {
         ResultSet rs = null;
+        ArrayList<String> publishData = new ArrayList<>();
         try (Connection conn = getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement("select * from tenderannouncement");
             rs = pstmt.executeQuery();
+            while (rs.next()){
+                publishData.add(rs.getString("tenderId"));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println("******* publish tender details" + rs);
-        return rs;
-
+        return publishData;
     }
 
-    public ResultSet getTenderIdFromAcceptedTenders() throws SQLException {
+    public ArrayList<String> getTenderIdFromAcceptedTenders() throws SQLException {
         ResultSet rs = null;
+        ArrayList<String> acceptedTenders = new ArrayList<>();
         try (Connection conn = getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement("select * from acceptedtenders");
             rs = pstmt.executeQuery();
+            while (rs.next()){
+                acceptedTenders.add(rs.getString("companyRegsiterNumber"));
+            }
         } catch (Exception e) {
             e.printStackTrace();
-
         }
         System.out.println("*******" + rs);
-        return rs;
-
+        return acceptedTenders;
     }
 
-    public ResultSet checkTenderIdExistancy(String tenderId) throws SQLException {
+    public String checkTenderIdExistancy(String tenderId) throws SQLException {
         ResultSet rs = null;
+        String file = "";
         try (Connection conn = getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement("select * from tenderannouncement where tenderId='" + tenderId + "'");
             rs = pstmt.executeQuery();
-
+            if (rs.next()){
+                file = rs.getString("fileName");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return rs;
+        return file;
     }
 
-    public ResultSet getConformTenders(String tenderId) throws SQLException {
+    public String getConformTenders(String tenderId) throws SQLException {
         ResultSet rs = null;
+        String tenderComapany = "";
         String qry = "select * from acceptedtenders where tenderId='" + tenderId + "'";
         try (Connection conn = getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement(qry);
             rs = pstmt.executeQuery();
-
+            if (rs.next()) {
+                tenderComapany = rs.getString("companyRegsiterNumber");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println("++++++++++++++" + qry);
-        return rs;
+        return tenderComapany;
     }
 
-    public ResultSet getConformAllTenders() throws SQLException {
+    public List<String> getConformAllTenders() throws SQLException {
         ResultSet rs = null;
+        List<String> allTenders = new ArrayList<>();
         try (Connection conn = getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement("select * from acceptedtenders");
             rs = pstmt.executeQuery();
-
+            while (rs.next()) {
+                allTenders.add(rs.getString("tenderId"));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return rs;
+        return allTenders;
     }
 
     public int updateRecords(String tenderId) throws SQLException {
@@ -271,11 +290,11 @@ public class DAO {
         return al;
     }
 
-    public boolean getSuccessStories(DTOShareInfo dtoShareInfo) throws SQLException {
+    public boolean submitSuccessStories(DTOShareInfo dtoShareInfo) throws SQLException {
         boolean flag = false;
         dtoShareInfo.toString();
         try (Connection conn = getConnection()) {
-            String qry = "insert into Info values(?,?,?)";
+            String qry = "insert into info values(?,?,?)";
             PreparedStatement pstmt = conn.prepareStatement(qry);
             pstmt.setInt(1, 0);
             pstmt.setString(2, dtoShareInfo.getCompanyRegisterNumber());
@@ -290,20 +309,23 @@ public class DAO {
         return flag;
     }
 
-    public ResultSet getAllSuccessStories() throws SQLException {
+    public List<String> getAllSuccessStories() throws SQLException {
         ResultSet rs = null;
+        List<String> story = new ArrayList<>();
         try (Connection conn = getConnection()) {
-            PreparedStatement pstmt = conn.prepareStatement("select * from Info");
+            PreparedStatement pstmt = conn.prepareStatement("select * from info");
             rs = pstmt.executeQuery();
+            while (rs.next()) {
+                story.add(rs.getString("story"));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return rs;
+        return story;
     }
 
     public ArrayList<String> getFileFromRegister() throws SQLException {
         ArrayList<String> al = new ArrayList<String>();
-
         ResultSet ra = null;
         try (Connection conn = getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement("select * from register where Desig!='admin' and file1!='noImage'");
@@ -320,16 +342,25 @@ public class DAO {
         return al;
     }
 
-    public ResultSet getDetails(String email) throws SQLException {
+    public List<String> getDetails(String email) throws SQLException {
         ResultSet rs = null;
+        List<String> details = new ArrayList<>();
+        String name = "";
+        String companyName = "";
+        String registerId = "";
         try (Connection conn = getConnection()) {
             String qry = "select * from register where email='" + email + "'";
             PreparedStatement pstmt = conn.prepareStatement(qry);
             rs = pstmt.executeQuery();
+            if (rs.next()){
+                details.add(rs.getString("name"));
+                details.add(rs.getString("companyName"));
+                details.add(rs.getString("registerId"));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return rs;
+        return details;
     }
 
     public String getFileNameUsingregisterId(String registerId) throws SQLException {
