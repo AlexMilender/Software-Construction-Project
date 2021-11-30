@@ -22,6 +22,11 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'gradle test'
+                post{
+                    always{
+                        sh '''docker stop $(docker ps -q)'''
+                    }
+                }
             }
         }
         post{
