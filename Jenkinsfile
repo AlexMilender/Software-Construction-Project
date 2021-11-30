@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Setup') {
             steps{
-                sh "docker stop $(docker ps -q)"
+                sh '''docker stop $(docker ps -q)'''
             }
         }
         stage('Build') {
@@ -26,7 +26,7 @@ pipeline {
         }
         post{
             always{
-                sh "docker stop $(docker ps -q)"
+                sh '''docker stop $(docker ps -q)'''
             }
         }
         stage('Deploy') {
