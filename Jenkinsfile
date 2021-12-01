@@ -28,9 +28,9 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'gradle test'
-                post{
+                script{
                     always{
-                        script{
+                        post{
                             try {
                                 sh '''docker stop $(docker ps -q)'''
                             } catch(e) {
