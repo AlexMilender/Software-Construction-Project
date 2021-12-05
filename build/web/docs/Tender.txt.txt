@@ -1,5 +1,0 @@
-ALTER TABLE `tenderform` CHANGE `CompanyRegisterNumber` `CompanyRegisterNumber` VARCHAR(25) NOT NULL;
-
-start end date
-alert
-pin
